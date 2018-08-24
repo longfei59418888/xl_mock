@@ -173,7 +173,7 @@ app.use("/*", (req, res) => {
 let port = argv.p ? argv.p : 2047
 app.listen(port,'0.0.0.0',()=>{
     opn(`http://127.0.0.1:${port}/index.html`,{app: 'google chrome'});
-    console.log(`open http://127.0.0.1:${port}/index.html on google chrome'`)
+    console.log(`start mock server listen : 127.0.0.1:${port}`)
 });
 
 function getMockData(list) {
