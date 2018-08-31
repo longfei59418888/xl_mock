@@ -25,6 +25,7 @@ program
     .usage('[cmd] [options]')
     .option('-p', '配置端口号')
     .option('-d', '配置mock目录名称 ，默认 mock')
+    .option('-x', '设置密码')
 program
     .command('start')
     .description('开启mock服务器..')
