@@ -6,6 +6,7 @@ var program = require('commander')
 var shell = require('shelljs')
 var tag = require('../lib/tag.js')
 var start = require('../lib/start.js')
+const opn = require('opn');
 // 如果存在本地的命令，执行本地的
 try {
     var localWebpack = require.resolve(path.join(process.cwd(), "node_modules", "xl_mock", "bin", "xl_mock.js"));
@@ -34,6 +35,6 @@ program
     .command('add <path>')
     .description('添加 mock 数据..')
     .action((path) => {
-        start(argv)
+        opn(`http://127.0.0.1:${port}/index.html`,{app: 'google chrome'});
     })
 program.parse(process.argv)

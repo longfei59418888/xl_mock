@@ -22,13 +22,16 @@ app.set('view engine', 'html');
 
 app.use("/index.html", (req, res) => {
     let data = JSON.parse(cat(path.join(__dirname,'./data/index.json')))
+    // 默认分类的所有接口
     let apiList = JSON.parse(cat(path.join(__dirname,'./data/0.json')))
     let apiLists=[],currentApi;
     for(var item in apiList){
+        //当前的接口
         if(!currentApi) currentApi= apiList[item]
         delete apiList[item].list
         apiLists.push(apiList[item])
     }
+    // 使用的 ejs 模版引擎进行渲染
     res.render('index.html', {title:'index',cate:data.cate,apiLists,currentApi});
 });
 
@@ -53,14 +56,15 @@ app.use("/___api/cate/add", (req, res) => {
         return
     }
     let cate = {name,id:data.cate.length}
-    data.cate.push(cate)
-    data.cateName.push(name)
+    data.cate.push(cate)  // 将分类添加到 json 文件的 cate 字段中
+    data.cateName.push(name) // 将分类名字添加到 json 文件的 cateName 字段中
     fs.writeFile(path.join(__dirname,'./data/index.json'), JSON.stringify(data), 'utf8', (err, rst)=>{
         if (err) {
             console.error(path+' is not fond');
             process.exitCode = 1;
             return;
         }
+        // 创建当前类的 api 列表 json 文件
         fs.writeFile(path.join(__dirname,'./data/'+(data.cate.length-1)+'.json'), '{}', 'utf8', (err, rst)=>{
             if (err) {
                 console.error(path+' is not fond');
@@ -127,12 +131,14 @@ app.use("/___api/list/add", (req, res) => {
     }
     reqBody.apiLink=apiUrl
     dataJson[apiUrl] = Object.assign({},{apiId},reqBody)
+    // 将接口信息添加到 spi json 中
     fs.writeFile(path.join(__dirname,`./data/${id}.json`), JSON.stringify(dataJson), 'utf8', (err, rst)=>{
         if (err) {
             console.error(path+' is not fond');
             process.exitCode = 1;
             return;
         }
+        // 添加接口信息到 index.json 中
         fs.writeFile(path.join(__dirname,'./data/index.json'), JSON.stringify(data), 'utf8', (err, rst)=>{
             if (err) {
                 console.error(path+' is not fond');
@@ -173,7 +179,7 @@ app.use("/*", (req, res) => {
 let port = argv.p ? argv.p : 2047
 app.listen(port,'0.0.0.0',()=>{
     opn(`http://127.0.0.1:${port}/index.html`,{app: 'google chrome'});
-    console.log(`start mock server listen : 127.0.0.1:${port}`)
+    console.log(`open http://127.0.0.1:${port}/index.html on google chrome'`)
 });
 
 function getMockData(list) {
