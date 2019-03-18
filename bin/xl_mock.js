@@ -4,7 +4,6 @@ var path = require('path');
 var argv = require('yargs').argv
 var program = require('commander')
 var shell = require('shelljs')
-var tag = require('../lib/tag.js')
 var start = require('../lib/start.js')
 const opn = require('opn');
 // 如果存在本地的命令，执行本地的
