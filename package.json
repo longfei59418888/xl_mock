@@ -1,10 +1,9 @@
 {
   "name": "xl_mock",
-  "version": "1.0.4",
+  "version": "2.0.1",
   "description": "用于创建 mock ，创建 mock 服务，生成mock 目录...",
   "main": "index.js",
   "scripts": {
-    "start": "forever start ./bin/xl_mock.js -p 3303",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": "./bin/xl_mock.js",
