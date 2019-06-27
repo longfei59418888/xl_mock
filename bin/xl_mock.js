@@ -35,6 +35,6 @@ program
     .command('add <path>')
     .description('添加 mock 数据..')
     .action((path) => {
-        opn(`http://127.0.0.1:${port}/index.html`,{app: 'google chrome'});
+        opn(`http://127.0.0.1:${port}/index.html`);
     })
 program.parse(process.argv)

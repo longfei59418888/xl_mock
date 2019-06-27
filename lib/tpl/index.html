@@ -335,6 +335,36 @@
                     }
                 });
             })
+            $('.list-cate ul').delegate('li .delete-cate','click',function (e) {
+                var parent = $(this).parent()
+                var id = parent.attr('cate-id')
+                e.stopPropagation()
+                e.preventDefault()
+                layer.confirm('是否删除该模块下所有的接口？', {
+                    btn: ['确认','取消'] //按钮
+                }, function(){
+                    $.ajax({
+                        type: "post",
+                        url: "/___api/cate/delete",
+                        data: {
+                            id:id,
+                        },
+                        dataType: "json",
+                        success: function(rst){
+                            if(rst.code == '0'){
+                                parent.remove()
+                                $('.list-cate ul li[cate-id="0000000000"]').click()
+                                layer.msg(rst.msg)
+                            }else {
+                                layer.msg(rst.msg)
+                            }
+                        }
+                    });
+                }, function(){
+
+                });
+            })
+            
             $('.list-cate ul').delegate('li','click',function () {
                 var _this = $(this),id = _this.attr('cate-id')
                 setCate(_this.index())
@@ -348,7 +378,7 @@
                         let html = ''
                         $('aside ul').html('')
                         list.forEach(function (item) {
-                            html += '<li cate-url="'+item.apiUrl+'" cate-id="'+item.apiId+'">'+item.apiName+'</li>'
+                            html += '<li cate-url="'+item.id+'" cate-id="'+item.cateId+'">'+item.apiName+'</li>'
                         })
                         $('aside ul').append(html)
                         $('.add-item').click()
@@ -360,13 +390,42 @@
                 liDom.removeClass('active')
                 $('.list-cate ul li').eq(index).addClass('active')
             }
+            $('.delete-data').on('click',function () {
+
+                layer.confirm('是否要删除改接口？', {
+                    btn: ['确认','取消'] //按钮
+                }, function(){
+                    var id = $('aside ul li.active').attr('cate-url')?$('aside ul li.active').attr('cate-url'):''
+                    var cateId = $('.list-cate ul li.active').attr('cate-id')
+                    $.ajax({
+                        type: "post",
+                        url: "/___api/list/delete",
+                        data: {
+                            id:id,
+                            cateId:cateId
+                        },
+                        dataType: "json",
+                        success: function(rst){
+                            if(rst.code == '0'){
+                                $('.list-cate ul li.active').remove()
+                                $('.add-item').click()
+                                layer.msg(rst.msg)
+                            }else {
+                                layer.msg(rst.msg)
+                            }
+                        }
+                    });
+                }, function(){
+
+                });
+            })
             $('.confirm-data').on('click',function () {
                 var data = getInputData($('.info'))
                 var listData = getApiItems($('.tab-content .list > .item'))
                 var id = $('.list-cate ul li.active').attr('cate-id')
                 data.list = listData
-                data.id = id
-                data.apiId = $('aside ul li.active').attr('cate-id')
+                data.cateId = id
+                data.id = $('aside ul li.active').attr('cate-url')?$('aside ul li.active').attr('cate-url'):''
                 $.ajax({
                     type: "post",
                     url: "/___api/list/add",
@@ -379,16 +438,14 @@
                             let item = rst.data
                             layer.msg(rst.msg)
                             if(item.save){
-                                $('aside ul li[cate-id="'+item.apiId+'"]').attr('cate-url',item.apiLink)
                                 return
                             }
                             $('aside ul li').removeClass('active')
                             $('aside ul')
-                                .prepend(`<li class="active" cate-url="${item.apiLink}" cate-id="${item.apiId}">${item.apiName}</li>`)
+                                .prepend(`<li class="active" cate-url="${item.id}" cate-id="${item.cateId}">${item.apiName}</li>`)
                         }
                     }
                 });
-
             })
             function getInputData(item) {
                 var data = {}
@@ -436,7 +493,7 @@
                 return data
             }
             var tpl = `<div class="item">
-                            <div style="width: 10%" class="item-j"><span>×</span><span sort="1" class="add-son">+</span></div>
+                            <div style="width: 10%" class="item-j"><span class="delete-item">×</span><span sort="1" class="add-son">+</span></div>
                             <div style="width: 30%" class="item-j item-2">
                                 <input id="name" type="text">
                             </div>
@@ -474,6 +531,19 @@
                         </div>`;
             $('.add-col').on('click',function () {
                 $('.tab-content .list').append(tpl);
+            })
+            $('.list').delegate('.delete-item','click',function (){
+                var _this = $(this),sort = _this.attr('sort'),_parent = _this.parent().parent()
+                if(['array[array]','object','array','array[object]'].indexOf(_parent.find('#type').val()) != -1){
+                    layer.confirm('当前会删除所有子节点？', {
+                        btn: ['确认','取消'] //按钮
+                    }, function(){
+                        _parent.remove()
+                        layer.msg('删除成功');
+                    })
+                    return
+                }
+                _parent.remove()
             })
             $('.list').delegate('.add-son','click',function () {
                 var _this = $(this),sort = _this.attr('sort'),_parent = _this.parent().parent()
@@ -518,7 +588,6 @@
                 data.list.forEach(function (item) {
                     list.append(setItemInfos(item))
                 })
-                console.log(list)
                 list.find('>.item').each(function (index,item) {
                     setInfoStyle(item)
                 })
@@ -579,7 +648,10 @@
         <div class="list-cate">
             <ul>
                 <% cate.forEach(function(item){%>
-                <li class="<% if(item.id == 0){ %>active<% } %>" cate-id="<%=item.id %>"><%=item.name %></li>
+                <li style="position: relative" class="<% if(item.id == 0){ %>active<% } %>" cate-id="<%=item.id %>">
+                    <% if(item.id != 0){ %><span class="delete-cate" style="position:absolute;left:0;
+                    text-align: center;font-size: 20px;display: inline-block;margin: 0 10px;cursor: pointer;color: #333;">×</span><% } %>
+                    <%=item.name %></li>
                 <% }) %>
 
             </ul>
@@ -590,13 +662,17 @@
             <p class="add-item">+ 添加接口</p>
             <ul>
                 <% apiLists.forEach(function(item){%>
-                <li cate-url="<%=item.apiLink %>" cate-id="<%=item.apiId %>"><%=item.apiName %></li>
+                <li cate-url="<%=item.id %>" cate-id="<%=item.cateId %>"><%=item.apiName %></li>
                 <% }) %>
             </ul>
         </aside>
         <section>
             <div class="info-2">
                 <h4>基本信息</h4>
+                <div class="btn" style="right: 155px">
+                    <p class="delete-data" style="border: 1px solid #ddd;border-radius: 3px;text-align: center;
+                        line-height: 35px;">删除</p>
+                </div>
                 <div class="btn">
                     <p class="confirm-data" style="border: 1px solid #ddd;border-radius: 3px;text-align: center;
                         line-height: 35px;">提交数据</p>
@@ -605,11 +681,11 @@
             <div class="info" style="margin-top: 20px">
                 <div class="item col-5">
                     <span>接口名称：</span>
-                    <input id="apiName" type="text">
+                    <input id="apiName" value="<%=currentApi.apiName %>" type="text">
                 </div>
                 <div class="item col-5">
                     <span>请求方法：</span>
-                    <select id="apiMethod">
+                    <select id="apiMethod" value="<%=currentApi.apiMethod %>">
                         <option value="get">get</option>
                         <option value="post">post</option>
                         <option value="delete">delete</option>
@@ -619,11 +695,11 @@
                 </div>
                 <div class="item col-10">
                     <span>接口地址：</span>
-                    <input id="apiUrl" type="text">
+                    <input id="apiUrl" value="<%=currentApi.apiUrl %>" type="text">
                 </div>
                 <div class="item col-10" style="padding-top: 20px;border: none">
                     <span>接口描述：</span>
-                    <textarea name="" id="apiDesp" cols="30" rows="10"></textarea>
+                    <textarea name="" value="<%=currentApi.apiDesp %>" id="apiDesp" cols="30" rows="10"></textarea>
                 </div>
                 <div style="clear: both"></div>
             </div>
