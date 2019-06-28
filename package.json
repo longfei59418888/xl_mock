@@ -1,6 +1,6 @@
 {
   "name": "xl_mock",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "用于创建 mock ，创建 mock 服务，生成mock 目录...",
   "main": "index.js",
   "scripts": {
