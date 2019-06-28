@@ -426,6 +426,17 @@
                 data.list = listData
                 data.cateId = id
                 data.id = $('aside ul li.active').attr('cate-url')?$('aside ul li.active').attr('cate-url'):''
+                data.jsonData = $('textarea[name="jsonData"]').val();
+                var json = ''
+               if(data.jsonData){
+                   try{
+                       json = JSON.parse(data.jsonData.replace(/\s/g,'').replace(/\n/g,''))
+                   }catch (e) {
+                       json= ''
+                       layer.msg('json数据不正确！')
+                   }
+               }
+                data.json = json
                 $.ajax({
                     type: "post",
                     url: "/___api/list/add",
@@ -562,6 +573,8 @@
                 $('input').val('')
                 $('#apiDesp').val('')
                 $('select').val('get')
+                $('textarea[name="jsonData"]').val('');
+                resetEdit()
             })
             $('aside ul').delegate('li','click',function () {
                 $('.add-item').click()
@@ -584,6 +597,7 @@
                 $('#apiDesp').val(data.apiDesp)
                 $('#apiUrl').val(data.apiUrl)
                 $('#apiMethod').val(data.apiMethod)
+                $('textarea[name="jsonData"]').val(data.jsonData)
                 var list = $('.tab-content .list');
                 data.list.forEach(function (item) {
                     list.append(setItemInfos(item))
@@ -624,6 +638,24 @@
                 }
                 return domTpl
             }
+            var jsonContentShow = false
+            $('#edit-option').click(function () {
+                if(jsonContentShow){
+                    resetEdit()
+                    return
+                }
+                jsonContentShow = true
+                $('#edit-option').html('+ 编辑json')
+                $('.tab-content').hide()
+                $('.json-content').show()
+            })
+            function resetEdit() {
+                jsonContentShow = false
+                $('#edit-option').html('+ 导入json')
+                $('.tab-content').show()
+                $('.json-content').hide()
+            }
+
         })
     </script>
 </head>
@@ -706,10 +738,26 @@
             <div class="info-2">
                 <h4 style="margin-top: 20px">接口信息</h4>
                 <div class="btn">
-                    <p>+ 导入json</p>
+                    <p id="edit-option">+ 导入json</p>
                 </div>
             </div>
-            <div class="tab-content" style="border-right: 1px solid #ccc">
+            <div class="json-content" style="display: none">
+                <textarea placeholder='例子：
+{
+  "test":1,
+  "object":{
+     "name":"xiao",
+     "list":[
+       "xiao",
+       1
+     ]
+   }
+}
+字符串和属性用双引号！！
+
+' name="jsonData" style="height: 500px;width: 100%;resize:none;"></textarea>
+            </div>
+            <div class="tab-content" style="border-right: 1px solid #ccc;">
                 <div class="head">
                     <p style="width: 10%">操作</p>
                     <p style="width: 30%">参数名</p>
@@ -720,7 +768,6 @@
                     <p style="width: 10%">描述</p>
                 </div>
                 <div class="list">
-
                 </div>
                 <p class="add-col">+ 添加</p>
             </div>
