@@ -1,1 +1,0 @@
-{"apiName":"sdfs","apiDesp":"dfsdfsdf","apiMethod":"get","list":[{"name":"sdfsdf","spec":"","val":"","desp":"","is":"0","type":"string"}],"cateId":"0000000000","id":"1561652167278","apiUrl":"/sdfs","jsonData":"","json":""}

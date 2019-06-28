@@ -1,1 +1,0 @@
-{"apiName":"","apiDesp":"","apiMethod":"get","list":[],"cateId":"0000000000","id":"1561699656924","apiUrl":"/","jsonData":"{\n  \"test\":1,\n  \"object\":{\n     \"name\":\"xiao\",\n     \"list\":[\n       \"xiao\",\n       1\n     ]\n}\n"}
